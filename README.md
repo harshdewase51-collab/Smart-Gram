@@ -5,15 +5,13 @@
 
   [![Java](https://img.shields.io/badge/Java-21%20LTS-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
   [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
-  [![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-  [![Flask](https://img.shields.io/badge/Flask-2.3.2-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
   [![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
   [![Leaflet](https://img.shields.io/badge/Leaflet-GIS_Mapping-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
   [![Three.js](https://img.shields.io/badge/Three.js-3D_WebGL-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
   [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
   <p align="center">
-    <b>Empowering rural development through interactive 3D spatial mapping, real-time GIS visualization, and multi-decade AI population and resource demand projection. Available with both Java (JDK 21 / Spring Boot 3) and Python (Flask) backends.</b>
+    <b>Empowering rural development through interactive 3D spatial mapping, real-time GIS visualization, and multi-decade AI population and resource demand projection. Built entirely with Java (JDK 21 LTS & Spring Boot 3).</b>
   </p>
 
   [Features](#-key-features) •
@@ -66,10 +64,11 @@
 - **Dynamic Growth Projection**: Forecast population growth across **10, 30, 50, and 100-year horizons**.
 - **Water Demand Estimation**: Line chart projection of daily water consumption requirements (liters/day) computed dynamically based on demographic growth curves.
 
-### ☁️ 5. Dual Polyglot Backend & Cloud Persistence
-- **Dual Backend Options**: Choose between a high-performance **Java (JDK 21 / Spring Boot 3)** server with Virtual Threads or a lightweight **Python (Flask)** server.
+### ☕ 5. Pure Java High-Performance Backend & Cloud Persistence
+- **Java 21 Virtual Threads**: Built with modern Java 21 concurrency (Project Loom) delivering ultra-lightweight, high-throughput REST APIs.
+- **Enterprise Spring Boot 3**: Fully modular Spring Web MVC architecture with POJO models and repository pattern.
 - **Firebase Cloud Firestore**: Cloud synchronization with authentication-aware data fetching.
-- **REST API Fallback**: Offline mode fallback to local in-memory village structures ensuring zero downtime during network outages or key misconfigurations.
+- **In-Memory REST API Fallback**: Offline mode fallback to local in-memory village structures ensuring zero downtime during network outages or key misconfigurations.
 
 ---
 
@@ -77,9 +76,7 @@
 
 ```mermaid
 graph TD
-    Client["Web Browser Client"] -->|HTTP / HTTPS| BackendChoice{"Dual Backend Support"}
-    BackendChoice -->|Java 21 / Spring Boot 3| JavaServer["Java Backend Server (:5002)"]
-    BackendChoice -->|Python 3.11 / Flask| FlaskServer["Flask Backend Server (:5002)"]
+    Client["Web Browser Client"] -->|HTTP / HTTPS| JavaServer["Java Backend Server (:5002)"]
     Client -->|Direct Auth / Firestore SDK| FirebaseCloud["Firebase / Cloud Firestore"]
     
     subgraph Frontend Layer
@@ -90,13 +87,10 @@ graph TD
         Client --> Diagnostic["firebase-test.html"]
     end
 
-    subgraph Backend Layer
+    subgraph Java Backend Layer
         JavaServer --> REST_API["REST API (/api/villages Endpoints)"]
         JavaServer --> StaticServer["Static Asset & Template Engine"]
-        FlaskServer --> REST_API
-        FlaskServer --> StaticServer
-        JavaServer --> JavaInit["InitFirestore.java (Java Seeder)"]
-        FlaskServer --> InitScript["init_firestore.py (Python Seeder)"]
+        JavaServer --> JavaInit["InitFirestore.java (Firestore Seeder)"]
     end
 
     subgraph Data & Cloud Services
@@ -113,12 +107,11 @@ graph TD
 SmartGram/
 ├── run-java.bat                # 1-Click launcher for Java Backend (Windows)
 ├── run-java.ps1                # PowerShell launcher for Java Backend
-├── app.py                      # Main Flask application entry point
-├── requirements.txt            # Python dependency requirements
 ├── FIREBASE_SETUP_GUIDE.md     # Dedicated guide for Firebase service account setup
-├── .gitignore                  # Git exclusion rules for virtual environments & secrets
+├── .gitignore                  # Git exclusion rules for builds & credentials
+├── .gitattributes              # Language statistic configuration (Java focus)
 ├── README.md                   # Project documentation
-├── backend-java/               # ☕ Java Backend (JDK 21)
+├── backend/                    # ☕ Java Backend (JDK 21 & Spring Boot 3)
 │   ├── SmartGramServer.java    # Standalone Virtual-Threaded Java HTTP Server
 │   ├── InitFirestore.java      # Firestore automated dataset seeding in Java
 │   ├── README.md               # Dedicated Java backend documentation
@@ -131,10 +124,6 @@ SmartGram/
 │           ├── controller/VillageApiController.java
 │           ├── controller/WebViewController.java
 │           └── config/WebMvcConfig.java
-├── backend/                    # 🐍 Python Backend (Flask)
-│   ├── app.py                  # Backend Flask application logic & REST API routes
-│   ├── init_firestore.py       # Firestore automated dataset seeding script
-│   └── requirements.txt        # Backend python dependencies
 └── frontend/
     ├── static/
     │   ├── css/
@@ -164,16 +153,14 @@ SmartGram/
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
+- **Java**: JDK 21 or higher
 - **Web Browser**: Chrome, Firefox, Edge, or Safari with WebGL enabled
-- **Backend Choice**:
-  - **Java**: JDK 21 or higher *(for Java Backend)*
-  - **Python**: Python 3.8 or higher *(for Python Backend)*
 
 ---
 
-### Option A: Run with Java 21 (Recommended - Zero External Dependencies)
+### Method 1: Instant Standalone Java Server (Zero External Setup)
 
-You can launch the complete SmartGram backend instantly with Java 21:
+You can launch the complete SmartGram backend instantly with Java 21 without installing Maven or third-party packages:
 
 ```powershell
 # Using the Windows Launchers:
@@ -181,36 +168,23 @@ You can launch the complete SmartGram backend instantly with Java 21:
 # or double-click run-java.bat
 
 # Or compile and run directly via Java CLI:
-javac -d backend-java/bin backend-java/SmartGramServer.java
-java -cp backend-java/bin com.smartgram.SmartGramServer 5002
+javac -d backend/bin backend/SmartGramServer.java
+java -cp backend/bin com.smartgram.SmartGramServer 5002
 ```
 
-#### Enterprise Spring Boot 3:
+---
+
+### Method 2: Enterprise Spring Boot 3
+
 ```bash
-cd backend-java/spring-boot
+cd backend/spring-boot
 mvn spring-boot:run
 ```
 
 ---
 
-### Option B: Run with Python (Flask)
-
-```bash
-# 1. Set up Virtual Environment
-python -m venv .venv
-.venv\Scripts\activate      # Windows (.venv/bin/activate on macOS/Linux)
-
-# 2. Install Dependencies
-pip install -r requirements.txt
-
-# 3. Start Server
-python app.py
-```
-
----
-
 ### 🌐 Open in Your Browser
-Once the server is running (either Java or Python on port 5002):
+Once the server is running on port 5002:
 - **Homepage (3D Globe):** `http://localhost:5002`
 - **Dashboard (GIS & AI):** `http://localhost:5002/dashboard`
 - **REST API:** `http://localhost:5002/api/villages`
@@ -228,10 +202,10 @@ SmartGram integrates seamlessly with **Google Firebase** for authentication and 
 4. Rename and place the key at: `backend/serviceAccountKey.json` *(Note: This file is automatically ignored by `.gitignore` for security)*.
 
 ### Step 2: Seed the Cloud Firestore Database
-Populate Firestore with initial village datasets:
+Populate Firestore with initial village datasets using Java:
 ```bash
 cd backend
-python init_firestore.py
+java -cp "bin;lib/*" com.smartgram.InitFirestore
 ```
 
 ### Step 3: Run Connection Diagnostics
@@ -319,7 +293,6 @@ W(t) = P(t) × 135  (Liters per Day)
 - **Mapping GIS**: [Leaflet.js](https://leafletjs.com/) v1.9.4 & OpenStreetMap
 - **Data Charting**: [Chart.js](https://chartjs.org/)
 - **Java Backend**: [Java 21 LTS](https://openjdk.org/) (Virtual Threads), [Spring Boot 3.2](https://spring.io/projects/spring-boot) / Standalone HTTP Server
-- **Python Backend**: Python 3.8+ / [Flask](https://flask.palletsprojects.com/) v2.3.2 with `Flask-CORS`
 - **Cloud Database & Auth**: Google [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup) & Cloud Firestore
 
 ---

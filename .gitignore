@@ -43,6 +43,7 @@ yarn-error.log*
 
 # Java
 *.class
+backend/bin/
 backend-java/bin/
 target/
 *.jar

@@ -1,6 +1,6 @@
 # ☕ SmartGram Java Backend
 
-This directory contains the **complete Java translation** of the SmartGram backend, converted from Python (`backend/app.py`, `app.py`, and `backend/init_firestore.py`).
+This directory contains the **pure Java backend** of SmartGram (JDK 21 LTS & Spring Boot 3).
 
 ---
 
@@ -10,8 +10,8 @@ This directory contains the **complete Java translation** of the SmartGram backe
 SmartGram/
 ├── run-java.bat                   # 1-click batch launcher for Windows
 ├── run-java.ps1                   # PowerShell launcher
-└── backend-java/
-    ├── SmartGramServer.java       # Standalone Java 21 Server (Zero dependencies!)
+└── backend/
+    ├── SmartGramServer.java       # Standalone Java 21 Server (Zero external dependencies!)
     ├── InitFirestore.java         # Firebase Firestore seeder in Java
     ├── bin/                       # Compiled bytecode
     └── spring-boot/               # Enterprise Spring Boot 3 Project
@@ -38,8 +38,8 @@ From the project root (`D:\SmartGram-main`):
 .\run-java.ps1
 
 # Or directly with javac/java:
-javac -d backend-java/bin backend-java/SmartGramServer.java
-java -cp backend-java/bin com.smartgram.SmartGramServer 5002
+javac -d backend/bin backend/SmartGramServer.java
+java -cp backend/bin com.smartgram.SmartGramServer 5002
 ```
 
 ### Endpoints:
@@ -55,7 +55,7 @@ java -cp backend-java/bin com.smartgram.SmartGramServer 5002
 If you prefer using Maven with Spring Boot:
 
 ```bash
-cd backend-java/spring-boot
+cd backend/spring-boot
 mvn spring-boot:run
 ```
 
@@ -67,5 +67,5 @@ To populate Cloud Firestore with Java:
 1. Ensure your `serviceAccountKey.json` is located in `backend/` or project root.
 2. Run with Firebase Admin Java SDK on classpath:
 ```bash
-java -cp "backend-java/bin;lib/*" com.smartgram.InitFirestore
+java -cp "backend/bin;lib/*" com.smartgram.InitFirestore
 ```
