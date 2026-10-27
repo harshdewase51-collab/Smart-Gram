@@ -3,6 +3,8 @@
   # 🌾 SmartGram
   ### Digital Twin Platform for Rural Village Development & AI Resource Forecasting
 
+  [![Java](https://img.shields.io/badge/Java-21%20LTS-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
+  [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
   [![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
   [![Flask](https://img.shields.io/badge/Flask-2.3.2-000000?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
   [![Firebase](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
@@ -11,7 +13,7 @@
   [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
   <p align="center">
-    <b>Empowering rural development through interactive 3D spatial mapping, real-time GIS visualization, and multi-decade AI population and resource demand projection.</b>
+    <b>Empowering rural development through interactive 3D spatial mapping, real-time GIS visualization, and multi-decade AI population and resource demand projection. Available with both Java (JDK 21 / Spring Boot 3) and Python (Flask) backends.</b>
   </p>
 
   [Features](#-key-features) •
@@ -64,9 +66,10 @@
 - **Dynamic Growth Projection**: Forecast population growth across **10, 30, 50, and 100-year horizons**.
 - **Water Demand Estimation**: Line chart projection of daily water consumption requirements (liters/day) computed dynamically based on demographic growth curves.
 
-### ☁️ 5. Dual Data Persistence (Cloud & REST Fallback)
+### ☁️ 5. Dual Polyglot Backend & Cloud Persistence
+- **Dual Backend Options**: Choose between a high-performance **Java (JDK 21 / Spring Boot 3)** server with Virtual Threads or a lightweight **Python (Flask)** server.
 - **Firebase Cloud Firestore**: Cloud synchronization with authentication-aware data fetching.
-- **Flask REST API Fallback**: Offline mode fallback to local memory/database structures ensuring zero downtime during network outages or key misconfigurations.
+- **REST API Fallback**: Offline mode fallback to local in-memory village structures ensuring zero downtime during network outages or key misconfigurations.
 
 ---
 
@@ -74,7 +77,9 @@
 
 ```mermaid
 graph TD
-    Client["Web Browser Client"] -->|HTTP / HTTPS| FlaskServer["Flask Backend Server (:5002)"]
+    Client["Web Browser Client"] -->|HTTP / HTTPS| BackendChoice{"Dual Backend Support"}
+    BackendChoice -->|Java 21 / Spring Boot 3| JavaServer["Java Backend Server (:5002)"]
+    BackendChoice -->|Python 3.11 / Flask| FlaskServer["Flask Backend Server (:5002)"]
     Client -->|Direct Auth / Firestore SDK| FirebaseCloud["Firebase / Cloud Firestore"]
     
     subgraph Frontend Layer
@@ -86,9 +91,12 @@ graph TD
     end
 
     subgraph Backend Layer
-        FlaskServer --> REST_API["REST API (/api/villages Endpoints)"]
-        FlaskServer --> StaticServer["Static Asset & Template Engine"]
-        FlaskServer --> InitScript["init_firestore.py - DB Population"]
+        JavaServer --> REST_API["REST API (/api/villages Endpoints)"]
+        JavaServer --> StaticServer["Static Asset & Template Engine"]
+        FlaskServer --> REST_API
+        FlaskServer --> StaticServer
+        JavaServer --> JavaInit["InitFirestore.java (Java Seeder)"]
+        FlaskServer --> InitScript["init_firestore.py (Python Seeder)"]
     end
 
     subgraph Data & Cloud Services
@@ -103,12 +111,27 @@ graph TD
 
 ```
 SmartGram/
+├── run-java.bat                # 1-Click launcher for Java Backend (Windows)
+├── run-java.ps1                # PowerShell launcher for Java Backend
 ├── app.py                      # Main Flask application entry point
 ├── requirements.txt            # Python dependency requirements
 ├── FIREBASE_SETUP_GUIDE.md     # Dedicated guide for Firebase service account setup
 ├── .gitignore                  # Git exclusion rules for virtual environments & secrets
 ├── README.md                   # Project documentation
-├── backend/
+├── backend-java/               # ☕ Java Backend (JDK 21)
+│   ├── SmartGramServer.java    # Standalone Virtual-Threaded Java HTTP Server
+│   ├── InitFirestore.java      # Firestore automated dataset seeding in Java
+│   ├── README.md               # Dedicated Java backend documentation
+│   └── spring-boot/            # Enterprise Spring Boot 3 MVC Project
+│       ├── pom.xml             # Maven dependencies
+│       └── src/main/java/com/smartgram/
+│           ├── SmartGramApplication.java
+│           ├── model/Village.java
+│           ├── repository/VillageRepository.java
+│           ├── controller/VillageApiController.java
+│           ├── controller/WebViewController.java
+│           └── config/WebMvcConfig.java
+├── backend/                    # 🐍 Python Backend (Flask)
 │   ├── app.py                  # Backend Flask application logic & REST API routes
 │   ├── init_firestore.py       # Firestore automated dataset seeding script
 │   └── requirements.txt        # Backend python dependencies
@@ -141,38 +164,56 @@ SmartGram/
 ## 🚀 Quick Start Guide
 
 ### Prerequisites
-- **Python**: 3.8 or higher
 - **Web Browser**: Chrome, Firefox, Edge, or Safari with WebGL enabled
+- **Backend Choice**:
+  - **Java**: JDK 21 or higher *(for Java Backend)*
+  - **Python**: Python 3.8 or higher *(for Python Backend)*
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/murtydsk-design/SmartGram.git
-cd SmartGram
+---
+
+### Option A: Run with Java 21 (Recommended - Zero External Dependencies)
+
+You can launch the complete SmartGram backend instantly with Java 21:
+
+```powershell
+# Using the Windows Launchers:
+.\run-java.ps1
+# or double-click run-java.bat
+
+# Or compile and run directly via Java CLI:
+javac -d backend-java/bin backend-java/SmartGramServer.java
+java -cp backend-java/bin com.smartgram.SmartGramServer 5002
 ```
 
-### 2. Set Up Virtual Environment
+#### Enterprise Spring Boot 3:
 ```bash
-# On macOS / Linux:
-python3 -m venv .venv
-source .venv/bin/activate
+cd backend-java/spring-boot
+mvn spring-boot:run
+```
 
-# On Windows:
+---
+
+### Option B: Run with Python (Flask)
+
+```bash
+# 1. Set up Virtual Environment
 python -m venv .venv
-.venv\Scripts\activate
-```
+.venv\Scripts\activate      # Windows (.venv/bin/activate on macOS/Linux)
 
-### 3. Install Dependencies
-```bash
+# 2. Install Dependencies
 pip install -r requirements.txt
-```
 
-### 4. Run the SmartGram Server
-```bash
+# 3. Start Server
 python app.py
 ```
 
-### 5. Open in Your Browser
-Navigate to `http://localhost:5002` to access the application.
+---
+
+### 🌐 Open in Your Browser
+Once the server is running (either Java or Python on port 5002):
+- **Homepage (3D Globe):** `http://localhost:5002`
+- **Dashboard (GIS & AI):** `http://localhost:5002/dashboard`
+- **REST API:** `http://localhost:5002/api/villages`
 
 ---
 
@@ -277,7 +318,8 @@ W(t) = P(t) × 135  (Liters per Day)
 - **3D Visualization**: [Three.js](https://threejs.org/) (WebGL rendering engine)
 - **Mapping GIS**: [Leaflet.js](https://leafletjs.com/) v1.9.4 & OpenStreetMap
 - **Data Charting**: [Chart.js](https://chartjs.org/)
-- **Backend Framework**: Python 3.8+ / [Flask](https://flask.palletsprojects.com/) v2.3.2 with `Flask-CORS`
+- **Java Backend**: [Java 21 LTS](https://openjdk.org/) (Virtual Threads), [Spring Boot 3.2](https://spring.io/projects/spring-boot) / Standalone HTTP Server
+- **Python Backend**: Python 3.8+ / [Flask](https://flask.palletsprojects.com/) v2.3.2 with `Flask-CORS`
 - **Cloud Database & Auth**: Google [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup) & Cloud Firestore
 
 ---
@@ -285,7 +327,7 @@ W(t) = P(t) × 135  (Liters per Day)
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
-1. Fork the Project (`https://github.com/murtydsk-design/SmartGram.git`)
+1. Fork the Project (`https://github.com/harshdewase51-collab/Smart-Gram.git`)
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
