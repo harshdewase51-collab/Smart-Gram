@@ -109,7 +109,6 @@ SmartGram/
 ├── run-java.ps1                # PowerShell launcher for Java Backend
 ├── FIREBASE_SETUP_GUIDE.md     # Dedicated guide for Firebase service account setup
 ├── .gitignore                  # Git exclusion rules for builds & credentials
-├── .gitattributes              # Language statistic configuration (Java focus)
 ├── README.md                   # Project documentation
 ├── backend/                    # ☕ Java Backend (JDK 21 & Spring Boot 3)
 │   ├── SmartGramServer.java    # Standalone Virtual-Threaded Java HTTP Server

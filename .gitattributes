@@ -1,8 +1,0 @@
-# GitHub Linguist Language Overrides
-# Ensure repository language statistics reflect Java as the core programming language
-
-*.html linguist-detectable=false
-*.css linguist-detectable=false
-*.js linguist-detectable=false
-*.bat linguist-detectable=false
-*.ps1 linguist-detectable=false
